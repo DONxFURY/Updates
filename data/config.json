@@ -1,0 +1,23 @@
+{
+  "serverName": "FANZVILLE",
+  "subtitle": "DayZ Server \u2022 Ops Console",
+  "accent": "#ff1b3a",
+  "accent2": "#7c3aed",
+  "maintainerPassphrase": "CHANGE_ME",
+  "timezone": "America/Los_Angeles",
+  "repoHint": "Edit /data/tasks.json and /data/updates.json to update the public board.",
+  "links": [
+    {
+      "label": "Discord",
+      "url": "https://discord.gg/your-invite"
+    },
+    {
+      "label": "Website",
+      "url": "https://your-site.com"
+    },
+    {
+      "label": "Donate",
+      "url": "https://your-donate-link.com"
+    }
+  ]
+}
