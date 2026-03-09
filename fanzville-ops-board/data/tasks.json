@@ -1,0 +1,53 @@
+[
+  {
+    "id": "t-001",
+    "title": "Rebalance trader pricing (weapons + ammo)",
+    "description": "Adjust buy/sell spreads, add tiered price caps, and audit high-value loot loops.",
+    "status": "in_progress",
+    "priority": 4,
+    "category": "Economy",
+    "due": "2026-03-10",
+    "createdAt": "2026-03-06T20:00:00Z"
+  },
+  {
+    "id": "t-002",
+    "title": "Server performance pass (AI + loot cycles)",
+    "description": "Profile spikes; tune AI simulation ranges; reduce redundant loot refresh; verify FPS stability in hotspots.",
+    "status": "todo",
+    "priority": 4,
+    "category": "Performance",
+    "due": "2026-03-12",
+    "createdAt": "2026-03-06T22:15:00Z"
+  },
+  {
+    "id": "t-003",
+    "title": "Implement weekend event pipeline",
+    "description": "Add event templates: convoy, king-of-the-hill, scav hunt. Include announcement + rewards config.",
+    "status": "todo",
+    "priority": 3,
+    "category": "Events",
+    "due": "2026-03-15",
+    "createdAt": "2026-03-07T00:30:00Z"
+  },
+  {
+    "id": "t-004",
+    "title": "Fix basebuilding clipping on selected ramps",
+    "description": "Patch collision and placement rules; verify with vanilla + modded structures; add blocked placements list.",
+    "status": "blocked",
+    "priority": 3,
+    "category": "Basebuilding",
+    "due": "2026-03-11",
+    "createdAt": "2026-03-07T02:10:00Z"
+  },
+  {
+    "id": "t-005",
+    "title": "Changelog page polish + patch note format",
+    "description": "Standardize: Added / Changed / Fixed / Known Issues. Add emoji tags for quick scan.",
+    "status": "done",
+    "priority": 2,
+    "category": "Ops",
+    "due": null,
+    "createdAt": "2026-03-05T18:00:00Z",
+    "completedAt": "2026-03-07T18:00:00Z"
+  }
+]

@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="theme-color" content="#07070A" />
+  <title>FANZVILLE Ops Console</title>
+
+  <!-- Fonts (optional, safe to remove for fully offline) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Orbitron:wght@500;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="./assets/style.css" />
+
+  <!-- Icons -->
+  <script defer src="https://unpkg.com/lucide@latest"></script>
+  <!-- Charts -->
+  <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <!-- Markdown -->
+  <script defer src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='%23ff1b3a' d='M32 4l25 14v28L32 60 7 46V18z'/%3E%3Cpath fill='%2307070A' d='M20 20h24v8H20zm0 12h18v8H20z'/%3E%3C/svg%3E"/>
+</head>
+
+<body>
+  <canvas id="fx" aria-hidden="true"></canvas>
+
+  <div class="app">
+    <header class="topbar">
+      <div class="topbar__left">
+        <div class="brand">
+          <div class="brand__mark" aria-hidden="true">
+            <span></span><span></span><span></span>
+          </div>
+          <div class="brand__text">
+            <div class="brand__title" id="serverName">FANZVILLE</div>
+            <div class="brand__sub" id="serverSub">DayZ Server • Ops Console</div>
+          </div>
+        </div>
+      </div>
+
+      <nav class="topbar__nav" aria-label="Primary">
+        <button class="pill is-active" data-route="overview">
+          <i data-lucide="radar"></i><span>Overview</span>
+        </button>
+        <button class="pill" data-route="tasks">
+          <i data-lucide="kanban-square"></i><span>Tasks</span>
+        </button>
+        <button class="pill" data-route="updates">
+          <i data-lucide="scroll-text"></i><span>Updates</span>
+        </button>
+        <button class="pill" data-route="about">
+          <i data-lucide="info"></i><span>About</span>
+        </button>
+      </nav>
+
+      <div class="topbar__right">
+        <button class="iconbtn" id="themeBtn" title="Toggle theme">
+          <i data-lucide="sparkles"></i>
+        </button>
+        <button class="iconbtn" id="maintainerBtn" title="Maintainer mode">
+          <i data-lucide="key-round"></i>
+        </button>
+      </div>
+    </header>
+
+    <main class="main">
+      <!-- Sidebar (filters / actions) -->
+      <aside class="side">
+        <div class="panel panel--sticky">
+          <div class="panel__title">
+            <div class="panel__titleLeft">
+              <i data-lucide="sliders-horizontal"></i>
+              <span>Filters</span>
+            </div>
+            <button class="ghost" id="clearFiltersBtn">Clear</button>
+          </div>
+
+          <div class="field">
+            <label>Search</label>
+            <input id="q" type="text" placeholder="Search tasks & updates..." autocomplete="off" />
+          </div>
+
+          <div class="grid2">
+            <div class="field">
+              <label>Status</label>
+              <select id="statusFilter">
+                <option value="">Any</option>
+                <option value="todo">To do</option>
+                <option value="in_progress">In progress</option>
+                <option value="blocked">Blocked</option>
+                <option value="done">Done</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Priority</label>
+              <select id="priorityFilter">
+                <option value="">Any</option>
+                <option value="4">Critical</option>
+                <option value="3">High</option>
+                <option value="2">Normal</option>
+                <option value="1">Low</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Category</label>
+            <select id="categoryFilter">
+              <option value="">Any</option>
+            </select>
+          </div>
+
+          <div class="switchRow">
+            <label class="switch">
+              <input id="showDone" type="checkbox" checked />
+              <span class="switch__ui"></span>
+            </label>
+            <div class="switchRow__text">
+              <div class="switchRow__title">Show done</div>
+              <div class="switchRow__sub">Keep completed tasks visible</div>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="panel__title">
+            <div class="panel__titleLeft">
+              <i data-lucide="zap"></i>
+              <span>Actions</span>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button class="btn" id="addTaskBtn" disabled><i data-lucide="plus"></i><span>Add task</span></button>
+            <button class="btn" id="addUpdateBtn" disabled><i data-lucide="pen-line"></i><span>Add update</span></button>
+            <button class="btn btn--ghost" id="exportBtn"><i data-lucide="download"></i><span>Export JSON</span></button>
+            <button class="btn btn--ghost" id="importBtn"><i data-lucide="upload"></i><span>Import JSON</span></button>
+            <button class="btn btn--danger" id="resetBtn" title="Resets local edits only"><i data-lucide="rotate-ccw"></i><span>Reset local</span></button>
+            <input id="importFile" type="file" accept="application/json" hidden />
+          </div>
+
+          <div class="hint" id="repoHint"></div>
+        </div>
+
+        <div class="panel">
+          <div class="panel__title">
+            <div class="panel__titleLeft">
+              <i data-lucide="link"></i>
+              <span>Links</span>
+            </div>
+          </div>
+          <div class="links" id="links"></div>
+        </div>
+      </aside>
+
+      <!-- Content -->
+      <section class="content">
+        <!-- Overview -->
+        <section class="route is-active" id="route-overview">
+          <div class="hero">
+            <div class="hero__left">
+              <div class="kicker">LIVE BUILD STATUS</div>
+              <h1 class="hero__title">
+                <span class="thin">FANZVILLE</span>
+                <span class="glow">Ops Console</span>
+              </h1>
+              <p class="hero__sub">
+                A clean public roadmap + patch log. Drag tasks across the board in maintainer mode.
+              </p>
+
+              <div class="hero__stats" id="statCards">
+                <!-- injected -->
+              </div>
+
+              <div class="hero__cta">
+                <button class="btn btn--primary" data-jump="tasks"><i data-lucide="kanban-square"></i><span>Open Tasks</span></button>
+                <button class="btn btn--ghost" data-jump="updates"><i data-lucide="scroll-text"></i><span>View Updates</span></button>
+              </div>
+            </div>
+
+            <div class="hero__right">
+              <div class="panel panel--chart">
+                <div class="panel__title">
+                  <div class="panel__titleLeft">
+                    <i data-lucide="pie-chart"></i>
+                    <span>Progress</span>
+                  </div>
+                  <span class="badge" id="progressBadge">0%</span>
+                </div>
+                <div class="chartWrap">
+                  <canvas id="progressChart" width="400" height="300"></canvas>
+                  <div class="chartCenter" id="chartCenter">
+                    <div class="chartCenter__big" id="doneCount">0</div>
+                    <div class="chartCenter__small">Done</div>
+                  </div>
+                </div>
+                <div class="mini" id="miniMetrics"></div>
+              </div>
+
+              <div class="panel">
+                <div class="panel__title">
+                  <div class="panel__titleLeft">
+                    <i data-lucide="activity"></i>
+                    <span>Latest update</span>
+                  </div>
+                  <span class="badge badge--soft" id="latestType">—</span>
+                </div>
+                <div class="latest" id="latestUpdate">
+                  <!-- injected -->
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="gridSplit">
+            <div class="panel">
+              <div class="panel__title">
+                <div class="panel__titleLeft">
+                  <i data-lucide="siren"></i>
+                  <span>Critical path</span>
+                </div>
+                <span class="badge badge--danger">P4</span>
+              </div>
+              <div class="list" id="criticalList"></div>
+            </div>
+
+            <div class="panel">
+              <div class="panel__title">
+                <div class="panel__titleLeft">
+                  <i data-lucide="clock-3"></i>
+                  <span>Coming up</span>
+                </div>
+                <span class="badge badge--soft">Due soon</span>
+              </div>
+              <div class="list" id="dueSoonList"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Tasks -->
+        <section class="route" id="route-tasks">
+          <div class="routeHead">
+            <div>
+              <h2 class="routeTitle">Tasks board</h2>
+              <p class="routeSub">Drag cards to update status (maintainer mode only). Filters apply.</p>
+            </div>
+            <div class="routeHead__right">
+              <div class="seg" id="viewSeg">
+                <button class="seg__btn is-active" data-view="kanban"><i data-lucide="columns-3"></i><span>Kanban</span></button>
+                <button class="seg__btn" data-view="list"><i data-lucide="list"></i><span>List</span></button>
+              </div>
+            </div>
+          </div>
+
+          <div class="kanban" id="kanban"></div>
+          <div class="table" id="taskTable" hidden></div>
+        </section>
+
+        <!-- Updates -->
+        <section class="route" id="route-updates">
+          <div class="routeHead">
+            <div>
+              <h2 class="routeTitle">Updates</h2>
+              <p class="routeSub">Patch notes, announcements, and hotfixes. Search works across content.</p>
+            </div>
+          </div>
+
+          <div class="timeline" id="timeline"></div>
+        </section>
+
+        <!-- About -->
+        <section class="route" id="route-about">
+          <div class="panel">
+            <div class="panel__title">
+              <div class="panel__titleLeft">
+                <i data-lucide="shield"></i>
+                <span>About this board</span>
+              </div>
+              <span class="badge badge--soft">GitHub-ready</span>
+            </div>
+
+            <div class="prose">
+              <p>
+                This is a <strong>static</strong> Ops Board built for <strong>GitHub Pages</strong>.
+                Update the repo JSON files to publish changes:
+              </p>
+              <ul>
+                <li><code>/data/tasks.json</code> — tasks and statuses</li>
+                <li><code>/data/updates.json</code> — patch notes / announcements</li>
+                <li><code>/data/config.json</code> — server name, links, and passphrase</li>
+              </ul>
+              <p>
+                Maintainer mode enables editing in-browser (stored in <code>localStorage</code>) and lets you
+                export the JSON to commit back into the repo.
+              </p>
+              <div class="callout">
+                <strong>Tip:</strong> Change the maintainer passphrase in <code>config.json</code> and keep it private.
+                This is not secure authentication — it’s just to prevent accidental edits.
+              </div>
+            </div>
+          </div>
+
+          <div class="gridSplit">
+            <div class="panel">
+              <div class="panel__title">
+                <div class="panel__titleLeft">
+                  <i data-lucide="terminal"></i>
+                  <span>Deploy to GitHub Pages</span>
+                </div>
+              </div>
+              <div class="prose">
+                <ol>
+                  <li>Create a repo and push these files to <code>main</code>.</li>
+                  <li>Repo → <strong>Settings</strong> → <strong>Pages</strong>.</li>
+                  <li>Source: <strong>Deploy from a branch</strong>.</li>
+                  <li>Branch: <strong>main</strong> / Folder: <strong>/ (root)</strong>.</li>
+                </ol>
+                <p>That’s it. Your Ops Board is live.</p>
+              </div>
+            </div>
+
+            <div class="panel">
+              <div class="panel__title">
+                <div class="panel__titleLeft">
+                  <i data-lucide="sparkles"></i>
+                  <span>Customization</span>
+                </div>
+              </div>
+              <div class="prose">
+                <ul>
+                  <li>Colors and links: edit <code>/data/config.json</code></li>
+                  <li>Brand vibe: edit <code>/assets/style.css</code> variables</li>
+                  <li>Add sections: edit <code>/assets/app.js</code></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <footer class="foot">
+      <div class="foot__left">
+        <span class="dot"></span>
+        <span id="footStatus">Loaded</span>
+      </div>
+      <div class="foot__right">
+        <span class="muted">FANZVILLE Ops Console</span>
+        <span class="sep">•</span>
+        <span class="muted">Static • GitHub Pages</span>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Modals -->
+  <div class="modal" id="modal" aria-hidden="true">
+    <div class="modal__backdrop" data-close="1"></div>
+    <div class="modal__panel" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal__head">
+        <div class="modal__title" id="modalTitle">Modal</div>
+        <button class="iconbtn" data-close="1" title="Close"><i data-lucide="x"></i></button>
+      </div>
+      <div class="modal__body" id="modalBody"></div>
+      <div class="modal__foot" id="modalFoot"></div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="./assets/app.js"></script>
+</body>
+</html>

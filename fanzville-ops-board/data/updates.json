@@ -1,0 +1,18 @@
+[
+  {
+    "id": "u-001",
+    "type": "patch",
+    "title": "Patch v0.9.4 \u2014 Economy Tune + Loot Pass",
+    "summary": "Trader spreads tightened, rare loot moved, and helicopter crash tables adjusted.",
+    "content": "### Added\n- New mid-tier barter options for building materials.\n\n### Changed\n- Trader spreads reduced on essentials.\n- Loot tables rebalanced to reduce early-game snowball.\n\n### Fixed\n- Duplicate item spawns in 2 coastal zones.\n\n### Known Issues\n- Occasional base ramp placement clipping (tracked).",
+    "publishedAt": "2026-03-07T19:30:00Z"
+  },
+  {
+    "id": "u-002",
+    "type": "announcement",
+    "title": "Roadmap: March Wipe Prep",
+    "summary": "Focus: performance stability, economy balance, and repeatable weekend events.",
+    "content": "This month we\u2019re prioritizing:\n\n- **Performance stability** in hotspots\n- **Economy balance** (less inflation, tighter loops)\n- **Events pipeline** so weekends hit different\n\nTrack progress in the **Tasks** tab.",
+    "publishedAt": "2026-03-06T17:00:00Z"
+  }
+]
